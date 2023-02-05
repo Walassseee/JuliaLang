@@ -1,7 +1,7 @@
 # Testando Biblioteca Pluto (Notebboks in Julia)
 
 using Pkg
-pkg"add Pluto"
+# pkg"add Pluto"
 
 import Pluto
 Pluto.run()
