@@ -83,8 +83,38 @@ Mode(x)
 # Variância
 #-----------------------------------------------------------------------------------------------------------------
 
+function Variance( Values )
+    DistanceOfMean = []
 
+    for Value in Values
+        pushfirst!( DistanceOfMean ,(Value - ArithmeticMean( Values )) ^ 2)
+    end
+    return sum(DistanceOfMean) / (length( Values ) - 1)
+end
 
+Variance(x)
 
+#-----------------------------------------------------------------------------------------------------------------
+# Desvio Médio Absoluto
+#-----------------------------------------------------------------------------------------------------------------
 
+function AbsoluteAverageDeviation( Values )
+    DistanceOfMean = []
 
+    for Value in Values
+        pushfirst!( DistanceOfMean , abs(Value - ArithmeticMean( Values )))
+    end
+    return sum(DistanceOfMean) / length( Values )
+end
+
+AbsoluteAverageDeviation(x)
+
+#-----------------------------------------------------------------------------------------------------------------
+# Desvio Padrão
+#-----------------------------------------------------------------------------------------------------------------
+
+function StanderdDeviation( Values )
+    return sqrt( Variance( Values ) )
+end
+
+StanderdDeviation(x)
