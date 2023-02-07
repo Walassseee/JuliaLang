@@ -15,7 +15,7 @@ Bibliotecas para análise descritiva dos dados.
 """
 
 # Importando dados CSV
-dados = CSV.read("C:\\Users\\brcpwmftomaz\\OneDrive - Oregon Tool\\Documents\\GitHub\\EstudosDataScience\\JuliaLang\\Dados.csv", DataFrame);
+dados = CSV.read("C:\\Users\\walas\\OneDrive\\Documentos\\GitHub\\JuliaLang\\Dados.csv", DataFrame);
 
 # Colunas da base de dados
 names(dados)
@@ -131,8 +131,64 @@ Inferência estatística com modelo MQO.
 
 pkg"add StatsModels"
 pkg"add GLM"
+pkg"add Pingouin"
 using StatsModels
 using GLM
+using Pingouin
+
+# Teste de normalidade da distribuição
+plot(qqnorm(dados.Idade, qqline = :R))
+
+# Teste Anderson de normalidade
+Pingouin.anderson(dados.Idade, "norm")
+
+# Teste de Shapiro-Wilk
+Pingouin.normality(dados.Idade)
 
 inferencia = @formula(Renda ~ Idade);
 @time MQO = lm(inferencia, dados)
+
+# Resultado R2
+r2(MQO)
+
+# Previsão & Resíduos
+predict(MQO)
+residuals(MQO)
+
+"""
+Testes de eficiência do modelo MQO. (Heterocedasticidade)
+"""
+
+pkg"add HypothesisTests"
+using HypothesisTests
+
+# Aleatoriedade e variância constante dos resíduos
+scatter(predict(MQO), residuals(MQO))
+scatter(predict(MQO), residuals(MQO).^2)
+
+# Normalidade dos resíduos
+histogram(residuals(MQO), bins = 20, title = "Normalidade dos resíduos", l = 0.5, legend = false)
+
+# Teste formal de Heterocedasticidade White e Pagan
+
+insertcols!(dados, :Constante => 1) # Adicionando uma constante a matriz
+
+HypothesisTests.BreuschPaganTest(Matrix(dados[:, [:Idade, :Renda, :Constante]]), residuals(MQO))
+
+HypothesisTests.WhiteTest(Matrix(dados[:, [:Idade, :Renda, :Constante]]), residuals(MQO), type = :White)
+
+HypothesisTests.WhiteTest(Matrix(dados[:, [:Idade, :Renda, :Constante]]), residuals(MQO), type = :linear_and_squares)
+
+"""
+Corrigindo heterocedasticidade com matriz de covariância (Erros padrões robustos)
+"""
+
+pkg"add CovarianceMatrices"
+pkg"add BenchmarkTools"
+using CovarianceMatrices
+using BenchmarkTools
+
+inferenciaH = @formula(Idade ~ Renda);
+@btime MQOH = glm(inferenciaH, dados, Normal(), IdentityLink())
+vcov(CRHC1(:Idade, dados), MQOH)
+stderror(CRHC1(:Idade, dados), MQOH)
