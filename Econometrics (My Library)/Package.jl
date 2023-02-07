@@ -1,7 +1,7 @@
-module 
 #--------------------------------------------------------------------------------------------------------Configurações
 using Pkg
 pkg"add DataFrames"
+pkg"status DataFrames"
 #-----------------------------------------------------------------------------------------------------Dados Utilizados
 
 using DataFrames
@@ -15,7 +15,7 @@ module Econometrics
     # Média Aritimética
     #-----------------------------------------------------------------------------------------------------------------
 
-    function ArithmeticMean( Values )
+    function ArithmeticMean( Values::AbstractArray )
         return sum( Values ) / length( Values )
     end
 
@@ -23,7 +23,7 @@ module Econometrics
     # Média Ponderada
     #-----------------------------------------------------------------------------------------------------------------
 
-    function WeightedMean( Values , Weight )
+    function WeightedMean( Values::AbstractArray , Weight::AbstractArray )
         WeightedValuesList = []
         
         if length( Values ) === length( Weight )
@@ -41,7 +41,7 @@ module Econometrics
     # Média Geométrica (Índice de Fischer)
     #-----------------------------------------------------------------------------------------------------------------
 
-    function GeometricMean( Values )
+    function GeometricMean( Values::AbstractArray )
         return sum( Values ) ^ (1 // length( Values ))
     end
 
@@ -49,7 +49,7 @@ module Econometrics
     # Mediana
     #-----------------------------------------------------------------------------------------------------------------
 
-    function Median( Values )
+    function Median( Values::AbstractArray )
     if length( Values ) % 2 != 0 # Impar
         sort( Values )
         MedianPoint = (length( Values ) + 1) / 2
@@ -66,8 +66,8 @@ module Econometrics
     # Moda Estatistica
     #-----------------------------------------------------------------------------------------------------------------
 
-    function Mode( Values )
-        FrequencyTable = DataFrame("Values" => unique( x ))
+    function Mode( Values::AbstractArray )
+        FrequencyTable = DataFrame("Values" => unique( Values ))
         FrequencyTable = insertcols(FrequencyTable, :Frequency => [count( i -> (i == Value), x) for Value in FrequencyTable.Values])
         return FrequencyTable.Values[FrequencyTable.Frequency .== maximum(FrequencyTable.Frequency)]
     end
@@ -76,7 +76,7 @@ module Econometrics
     # Variância
     #-----------------------------------------------------------------------------------------------------------------
 
-    function Variance( Values )
+    function Variance( Values::AbstractArray )
         DistanceOfMean = []
 
         for Value in Values
@@ -89,7 +89,7 @@ module Econometrics
     # Desvio Médio Absoluto
     #-----------------------------------------------------------------------------------------------------------------
 
-    function AbsoluteAverageDeviation( Values )
+    function AbsoluteAverageDeviation( Values::AbstractArray )
         DistanceOfMean = []
 
         for Value in Values
@@ -102,7 +102,7 @@ module Econometrics
     # Desvio Padrão
     #-----------------------------------------------------------------------------------------------------------------
 
-    function StanderdDeviation( Values )
+    function StanderdDeviation( Values::AbstractArray )
         return sqrt( Variance( Values ) )
     end
 
